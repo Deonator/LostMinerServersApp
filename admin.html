@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Админ вход</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a href="index.html">← Назад</a>
+  <h1>🔐 Вход в админку</h1>
+  <input id="pass" placeholder="Пароль администратора" type="password" />
+  <button onclick="login()">Войти</button>
+  <script>
+    function login() {
+      const pass = document.getElementById('pass').value;
+      if (pass === "15426378") {
+        localStorage.setItem("isAdmin", "true");
+        window.location.href = "admin-panel.html";
+      } else {
+        alert("❌ Неверный пароль!");
+      }
+    }
+  </script>
+</body>
+</html>

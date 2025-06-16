@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Админ-панель</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a href="index.html">← Назад</a>
+  <h1>⚙️ Админ-панель</h1>
+  <div id="server-list"></div>
+
+  <script>
+    if (localStorage.getItem("isAdmin") !== "true") {
+      alert("⛔ Нет доступа.");
+      window.location.href = "index.html";
+    }
+
+    function getServers() {
+      return JSON.parse(localStorage.getItem('servers') || '[]');
+    }
+    function setServers(data) {
+      localStorage.setItem('servers', JSON.stringify(data));
+    }
+
+    function getBanned() {
+      return JSON.parse(localStorage.getItem("bannedUsers") || "[]");
+    }
+    function setBanned(data) {
+      localStorage.setItem("bannedUsers", JSON.stringify(data));
+    }
+
+    function load() {
+      const list = document.getElementById('server-list');
+      const servers = getServers();
+      list.innerHTML = '';
+      servers.forEach(server => {
+        const div = document.createElement('div');
+        div.className = "card";
+        div.innerHTML = `
+          <h2>${server.name}</h2>
+          <p>IP: ${server.ip}</p>
+          <p>Пользователь ID: ${server.id}</p>
+          <button onclick="removeServer('${server.id}')">❌ Удалить сервер</button>
+          <button onclick="banUser('${server.id}')">🚫 Забанить пользователя</button>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    function removeServer(id) {
+      let servers = getServers();
+      servers = servers.filter(s => s.id !== id);
+      setServers(servers);
+      alert("🗑️ Сервер удалён");
+      load();
+    }
+
+    function banUser(id) {
+      const bans = getBanned();
+      if (!bans.includes(id)) {
+        bans.push(id);
+        setBanned(bans);
+        alert("🚫 Пользователь забанен");
+      }
+    }
+
+    load();
+  </script>
+</body>
+</html>

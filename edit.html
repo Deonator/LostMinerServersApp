@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Создание / редактирование сервера</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a href="index.html">← Назад</a>
+  <h1>🛠️ Редактирование сервера</h1>
+
+  <input id="name" placeholder="Название" />
+  <input id="type" placeholder="Тип" />
+  <input id="ip" placeholder="IP-адрес" />
+  <select id="status">
+    <option value="online">🟢 Онлайн</option>
+    <option value="offline">🔴 Оффлайн</option>
+  </select>
+  <textarea id="description" placeholder="Описание"></textarea>
+  <button onclick="saveServer()">💾 Сохранить</button>
+<script>
+  const banned = JSON.parse(localStorage.getItem("bannedUsers") || "[]");
+  const currentID = localStorage.getItem("userID");
+  if (banned.includes(currentID)) {
+    alert("🚫 Вы забанены и не можете создавать или редактировать сервер.");
+    window.location.href = "index.html";
+  }
+</script>
+
+  <script>
+    function getServers() {
+      return JSON.parse(localStorage.getItem('servers') || '[]');
+    }
+    function setServers(data) {
+      localStorage.setItem('servers', JSON.stringify(data));
+    }
+    function getMyId() {
+      return localStorage.getItem('myServerId');
+    }
+
+    const servers = getServers();
+    const myId = getMyId();
+    const current = servers.find(s => s.id === myId);
+
+    if (current) {
+      document.getElementById('name').value = current.name;
+      document.getElementById('type').value = current.type;
+      document.getElementById('ip').value = current.ip;
+      document.getElementById('status').value = current.status;
+      document.getElementById('description').value = current.description;
+    }
+
+    function saveServer() {
+      const name = document.getElementById('name').value.trim();
+      const type = document.getElementById('type').value.trim();
+      const ip = document.getElementById('ip').value.trim();
+      const status = document.getElementById('status').value;
+      const description = document.getElementById('description').value.trim();
+
+      if (!name || !ip) return alert("Название и IP обязательны!");
+
+      let servers = getServers();
+      let id = getMyId();
+
+      if (!id) {
+        id = Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('myServerId', id);
+      }
+
+      const data = { id, name, type, ip, status, description };
+      const index = servers.findIndex(s => s.id === id);
+      if (index !== -1) servers[index] = data;
+      else servers.push(data);
+      setServers(servers);
+
+      alert("✅ Сохранено!");
+      window.location.href = "index.html";
+    }
+  </script>
+</body>
+</html>

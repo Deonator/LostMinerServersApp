@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>LostMiner Servers</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>🛡️ Серверы LostMiner</h1>
+
+  <div id="my-server-section"></div>
+  <hr />
+  <div id="server-list"></div>
+<a href="admin.html" style="position:fixed;bottom:10px;right:10px;background:#222;padding:8px 12px;color:#0ff;border-radius:5px;text-decoration:none;">⚙️ Админ-панель</a>
+  <script>
+    function getServers() {
+      return JSON.parse(localStorage.getItem('servers') || '[]');
+    }
+    function setServers(data) {
+      localStorage.setItem('servers', JSON.stringify(data));
+    }
+    function getMyId() {
+      let id = localStorage.getItem('myServerId');
+      return id;
+    }
+
+    function load() {
+      const servers = getServers();
+      const myId = getMyId();
+      const list = document.getElementById('server-list');
+      const mySection = document.getElementById('my-server-section');
+      list.innerHTML = '';
+      mySection.innerHTML = '';
+
+      const myServer = servers.find(s => s.id === myId);
+      if (myServer) {
+        mySection.innerHTML = `
+          <h2>🌟 Ваш сервер</h2>
+          <div class="card">
+            <h2>${myServer.name}</h2>
+            <p>Тип: ${myServer.type}</p>
+            <p>Статус: <span class="${myServer.status}">${myServer.status === 'online' ? '🟢 Онлайн' : '🔴 Оффлайн'}</span></p>
+            <a href="server.html?id=${myServer.id}">Подробнее</a>
+            <a href="edit.html">✏️ Редактировать</a>
+          </div>
+        `;
+      } else {
+        mySection.innerHTML = `<a href="edit.html">➕ Создать свой сервер</a>`;
+      }
+
+      servers.forEach(server => {
+        if (server.id === myId) return;
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <h2>${server.name}</h2>
+          <p>Тип: ${server.type}</p>
+          <p>Статус: <span class="${server.status}">${server.status === 'online' ? '🟢 Онлайн' : '🔴 Оффлайн'}</span></p>
+          <a href="server.html?id=${server.id}">Подробнее</a>
+        `;
+        list.appendChild(card);
+      });
+    }
+
+    load();
+  </script>
+</body>
+</html>

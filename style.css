@@ -1,0 +1,58 @@
+body {
+  font-family: 'Courier New', monospace;
+  background-color: #1c1c1c;
+  color: #f2f2f2;
+  padding: 20px;
+}
+
+h1 {
+  color: #ffcc00;
+}
+
+.card {
+  background: #333;
+  border: 2px solid #555;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 10px;
+}
+
+.card a {
+  color: #00ffff;
+  text-decoration: none;
+}
+
+.online {
+  color: #00ff00;
+}
+.offline {
+  color: #ff4444;
+}
+
+button {
+  padding: 10px;
+  background-color: #ffcc00;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  margin: 5px 5px 0 0;
+}
+
+input, textarea, select {
+  display: block;
+  margin: 5px 0;
+  padding: 8px;
+  width: 100%;
+  background: #222;
+  color: #fff;
+  border: 1px solid #555;
+  border-radius: 5px;
+}
+
+.form {
+  background: #2a2a2a;
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Сервер</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <a href="index.html" style="color:#00ffff;">← Назад к списку серверов</a>
+  <div id="server-details"></div>
+  <script>
+    function getServers() {
+      return JSON.parse(localStorage.getItem('servers') || '[]');
+    }
+
+    const params = new URLSearchParams(location.search);
+    const id = params.get('id');
+    const server = getServers().find(s => s.id === id);
+    const div = document.getElementById('server-details');
+
+    if (server) {
+      div.innerHTML = `
+        <h1>${server.name}</h1>
+        <p><b>Тип:</b> ${server.type || '—'}</p>
+        <p><b>Статус:</b> ${server.status === 'online' ? '🟢 Онлайн' : '🔴 Оффлайн'}</p>
+        <p>${server.description || 'Без описания'}</p>
+        <p><b>IP:</b> ${server.ip}</p>
+        <button onclick="copyIP('${server.ip}')">🔗 Скопировать IP</button>
+      `;
+    } else {
+      div.innerHTML = `<p style="color:red;">❌ Сервер с ID <b>${id}</b> не найден. Возможно, вы удалили его или открыли ссылку с другого устройства.</p>`;
+    }
+
+    function copyIP(ip) {
+      navigator.clipboard.writeText(ip);
+      alert("IP скопирован: " + ip);
+    }
+  </script>
+</body>
+</html>
