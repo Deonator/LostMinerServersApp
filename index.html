@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>LostMiner Сервера</title>
+  <title>Серверы LostMiner</title>
   <style>
     body {
       background-color: #111;
@@ -26,7 +26,7 @@
   </style>
 </head>
 <body>
-  <h1>🌐 Список серверов LostMiner</h1>
+  <h1>📡 Серверы LostMiner</h1>
   <div id="servers"></div>
 
   <h2>Создать сервер</h2>
@@ -56,30 +56,37 @@
 
     const app = firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-
     const serversRef = db.ref("servers");
 
-    // Показать сервера
+    // Отобразить все сервера
     serversRef.on("value", (snapshot) => {
       const list = document.getElementById("servers");
       list.innerHTML = "";
       snapshot.forEach(child => {
         const data = child.val();
+        const id = child.key;
+
         const div = document.createElement("div");
         div.className = "server";
-        div.innerHTML = `<b>${data.name}</b> | ${data.type} | ${data.status}`;
+        div.innerHTML = `
+          <a href="server.html?id=${id}">
+            <b>${data.name}</b>
+          </a><br>
+          Тип: ${data.type}<br>
+          Статус: ${data.status === "online" ? "🟢 Онлайн" : "🔴 Оффлайн"}
+        `;
         list.appendChild(div);
       });
     });
 
-    // Добавить сервер
+    // Добавление нового сервера
     function addServer() {
       const name = document.getElementById("name").value.trim();
       const type = document.getElementById("type").value.trim();
       const status = document.getElementById("status").value;
 
       if (!name || !type) {
-        alert("Заполни название и тип!");
+        alert("Пожалуйста, заполни все поля.");
         return;
       }
 
