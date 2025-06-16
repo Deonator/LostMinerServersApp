@@ -2,98 +2,67 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Серверы LostMiner</title>
-  <style>
-    body {
-      background-color: #111;
-      color: #fff;
-      font-family: sans-serif;
-    }
-    a {
-      color: #00ffff;
-      text-decoration: none;
-    }
-    a:hover {
-      text-decoration: underline;
-    }
-    .server {
-      border: 1px solid #555;
-      padding: 10px;
-      margin-bottom: 10px;
-      border-radius: 8px;
-      background-color: #222;
-    }
-  </style>
+  <title>LostMiner Servers</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>📡 Серверы LostMiner</h1>
-  <div id="servers"></div>
+  <h1>🛡️ Серверы LostMiner</h1>
 
-  <h2>Создать сервер</h2>
-  <input id="name" placeholder="Название сервера"><br>
-  <input id="type" placeholder="Тип (PvP, RP...)"><br>
-  <select id="status">
-    <option value="online">🟢 Включен</option>
-    <option value="offline">🔴 Выключен</option>
-  </select><br>
-  <button onclick="addServer()">Создать</button>
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js"></script>
-
+  <div id="my-server-section"></div>
+  <hr />
+  <div id="server-list"></div>
+<a href="admin.html" style="position:fixed;bottom:10px;right:10px;background:#222;padding:8px 12px;color:#0ff;border-radius:5px;text-decoration:none;">⚙️ Админ-панель</a>
   <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyAIRk2K83lNl0Pun1Kk7swyRGaEOWH6zj0",
-      authDomain: "loststrahzcorporation.firebaseapp.com",
-      databaseURL: "https://loststrahzcorporation-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "loststrahzcorporation",
-      storageBucket: "loststrahzcorporation.firebasestorage.app",
-      messagingSenderId: "802412818791",
-      appId: "1:802412818791:web:e818386c7a6e6de2f7ffc2",
-      measurementId: "G-XYRS88N7KN"
-    };
+    function getServers() {
+      return JSON.parse(localStorage.getItem('servers') || '[]');
+    }
+    function setServers(data) {
+      localStorage.setItem('servers', JSON.stringify(data));
+    }
+    function getMyId() {
+      let id = localStorage.getItem('myServerId');
+      return id;
+    }
 
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-    const serversRef = db.ref("servers");
+    function load() {
+      const servers = getServers();
+      const myId = getMyId();
+      const list = document.getElementById('server-list');
+      const mySection = document.getElementById('my-server-section');
+      list.innerHTML = '';
+      mySection.innerHTML = '';
 
-    // Отобразить все сервера
-    serversRef.on("value", (snapshot) => {
-      const list = document.getElementById("servers");
-      list.innerHTML = "";
-      snapshot.forEach(child => {
-        const data = child.val();
-        const id = child.key;
-
-        const div = document.createElement("div");
-        div.className = "server";
-        div.innerHTML = `
-          <a href="server.html?id=${id}">
-            <b>${data.name}</b>
-          </a><br>
-          Тип: ${data.type}<br>
-          Статус: ${data.status === "online" ? "🟢 Онлайн" : "🔴 Оффлайн"}
+      const myServer = servers.find(s => s.id === myId);
+      if (myServer) {
+        mySection.innerHTML = `
+          <h2>🌟 Ваш сервер</h2>
+          <div class="card">
+            <h2>${myServer.name}</h2>
+            <p>Тип: ${myServer.type}</p>
+            <p>Статус: <span class="${myServer.status}">${myServer.status === 'online' ? '🟢 Онлайн' : '🔴 Оффлайн'}</span></p>
+            <a href="server.html?id=${myServer.id}">Подробнее</a>
+            <a href="edit.html">✏️ Редактировать</a>
+          </div>
         `;
-        list.appendChild(div);
-      });
-    });
-
-    // Добавление нового сервера
-    function addServer() {
-      const name = document.getElementById("name").value.trim();
-      const type = document.getElementById("type").value.trim();
-      const status = document.getElementById("status").value;
-
-      if (!name || !type) {
-        alert("Пожалуйста, заполни все поля.");
-        return;
+      } else {
+        mySection.innerHTML = `<a href="edit.html">➕ Создать свой сервер</a>`;
       }
 
-      serversRef.push({ name, type, status });
-      document.getElementById("name").value = "";
-      document.getElementById("type").value = "";
+      servers.forEach(server => {
+        if (server.id === myId) return;
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <h2>${server.name}</h2>
+          <p>Тип: ${server.type}</p>
+          <p>Статус: <span class="${server.status}">${server.status === 'online' ? '🟢 Онлайн' : '🔴 Оффлайн'}</span></p>
+          <a href="server.html?id=${server.id}">Подробнее</a>
+        `;
+        list.appendChild(card);
+      });
     }
+
+    load();
   </script>
 </body>
 </html>
