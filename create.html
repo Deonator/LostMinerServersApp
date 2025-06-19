@@ -2,56 +2,46 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Создание сервера</title>
+  <title>Создать сервер</title>
   <style>
     body {
       background-color: #111;
       color: #fff;
       font-family: sans-serif;
+      padding: 20px;
     }
-    input, select {
+    input, select, button {
       display: block;
-      margin: 8px 0;
+      margin: 10px 0;
       padding: 10px;
       width: 300px;
-      border-radius: 5px;
+      border-radius: 4px;
       border: none;
     }
     button {
-      padding: 10px 20px;
       background-color: #00aa00;
-      border: none;
-      border-radius: 5px;
       color: white;
       cursor: pointer;
-      font-size: 16px;
     }
     button:hover {
       background-color: #00cc00;
     }
-    a {
-      color: #00ffff;
-      text-decoration: none;
-    }
   </style>
 </head>
 <body>
-  <a href="index.html">← Назад</a>
-  <h1>🛠 Создание сервера</h1>
+  <h1>Создать сервер</h1>
 
   <input id="name" placeholder="Название сервера">
   <input id="type" placeholder="Тип (PvP, RP...)">
-  <input id="desc" placeholder="Описание сервера">
+  <input id="desc" placeholder="Описание">
   <select id="status">
     <option value="online">🟢 Включен</option>
     <option value="offline">🔴 Выключен</option>
   </select>
-  <button onclick="addServer()">Создать сервер</button>
+  <button id="createBtn">Создать</button>
 
-  <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js"></script>
-
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyAIRk2K83lNl0Pun1Kk7swyRGaEOWH6zj0",
@@ -60,29 +50,32 @@
       projectId: "loststrahzcorporation",
       storageBucket: "loststrahzcorporation.firebasestorage.app",
       messagingSenderId: "802412818791",
-      appId: "1:802412818791:web:e818386c7a6e6de2f7ffc2",
-      measurementId: "G-XYRS88N7KN"
+      appId: "1:802412818791:web:e818386c7a6e6de2f7ffc2"
     };
 
     const app = firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-    const serversRef = db.ref("servers");
 
-    function addServer() {
+    document.getElementById("createBtn").addEventListener("click", () => {
       const name = document.getElementById("name").value.trim();
       const type = document.getElementById("type").value.trim();
-      const description = document.getElementById("desc").value.trim();
+      const desc = document.getElementById("desc").value.trim();
       const status = document.getElementById("status").value;
 
       if (!name || !type) {
-        alert("Название и тип обязательны!");
+        alert("Введите название и тип!");
         return;
       }
 
-      serversRef.push({ name, type, status, description });
-      alert("✅ Сервер создан!");
-      window.location.href = "index.html";
-    }
+      db.ref("servers").push({ name, type, status, description: desc })
+        .then(() => {
+          alert("✅ Сервер создан!");
+          window.location.href = "index.html";
+        })
+        .catch((error) => {
+          alert("Ошибка при создании: " + error.message);
+        });
+    });
   </script>
 </body>
 </html>
