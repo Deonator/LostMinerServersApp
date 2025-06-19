@@ -13,9 +13,6 @@
       color: #00ffff;
       text-decoration: none;
     }
-    a:hover {
-      text-decoration: underline;
-    }
     .server {
       border: 1px solid #555;
       padding: 10px;
@@ -23,23 +20,16 @@
       border-radius: 8px;
       background-color: #222;
     }
-    input, select {
-      margin: 4px 0;
-      padding: 6px;
-      width: 250px;
-      border-radius: 4px;
-      border: none;
-    }
-    button {
+    .create-btn {
+      display: inline-block;
+      margin-top: 20px;
       padding: 10px 20px;
       background-color: #0077cc;
-      border: none;
       border-radius: 5px;
       color: white;
-      font-size: 16px;
-      cursor: pointer;
+      text-decoration: none;
     }
-    button:hover {
+    .create-btn:hover {
       background-color: #0099ff;
     }
   </style>
@@ -48,15 +38,7 @@
   <h1>🌍 Список серверов LostMiner</h1>
   <div id="servers">Загрузка...</div>
 
-  <h2>➕ Создать сервер</h2>
-  <input id="name" placeholder="Название сервера"><br>
-  <input id="type" placeholder="Тип (PvP, RP...)"><br>
-  <input id="desc" placeholder="Описание сервера"><br>
-  <select id="status">
-    <option value="online">🟢 Включен</option>
-    <option value="offline">🔴 Выключен</option>
-  </select><br>
-  <button onclick="addServer()">Создать</button>
+  <a href="create.html" class="create-btn">➕ Создать сервер</a>
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
@@ -78,7 +60,6 @@
     const db = firebase.database();
     const serversRef = db.ref("servers");
 
-    // Показываем список серверов
     serversRef.on("value", (snapshot) => {
       const list = document.getElementById("servers");
       list.innerHTML = "";
@@ -102,24 +83,6 @@
         list.appendChild(div);
       });
     });
-
-    // Добавление сервера
-    function addServer() {
-      const name = document.getElementById("name").value.trim();
-      const type = document.getElementById("type").value.trim();
-      const description = document.getElementById("desc").value.trim();
-      const status = document.getElementById("status").value;
-
-      if (!name || !type) {
-        alert("Название и тип обязательны!");
-        return;
-      }
-
-      serversRef.push({ name, type, status, description });
-      document.getElementById("name").value = "";
-      document.getElementById("type").value = "";
-      document.getElementById("desc").value = "";
-    }
   </script>
 </body>
 </html>
