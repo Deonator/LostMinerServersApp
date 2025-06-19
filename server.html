@@ -2,38 +2,88 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Сервер</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Сервер LostMiner</title>
+  <style>
+    body {
+      background-color: #111;
+      color: #fff;
+      font-family: sans-serif;
+    }
+    a {
+      color: #00ffff;
+      text-decoration: none;
+    }
+    .box {
+      background: #222;
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #00aa00;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #00cc00;
+    }
+  </style>
 </head>
 <body>
-  <a href="index.html" style="color:#00ffff;">← Назад к списку серверов</a>
-  <div id="server-details"></div>
+  <a href="index.html">← Назад к списку</a>
+  <h1>🔍 Информация о сервере</h1>
+  <div class="box" id="serverBox">Загрузка...</div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js"></script>
+
   <script>
-    function getServers() {
-      return JSON.parse(localStorage.getItem('servers') || '[]');
-    }
+    const firebaseConfig = {
+      apiKey: "AIzaSyAIRk2K83lNl0Pun1Kk7swyRGaEOWH6zj0",
+      authDomain: "loststrahzcorporation.firebaseapp.com",
+      databaseURL: "https://loststrahzcorporation-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "loststrahzcorporation",
+      storageBucket: "loststrahzcorporation.firebasestorage.app",
+      messagingSenderId: "802412818791",
+      appId: "1:802412818791:web:e818386c7a6e6de2f7ffc2",
+      measurementId: "G-XYRS88N7KN"
+    };
 
-    const params = new URLSearchParams(location.search);
-    const id = params.get('id');
-    const server = getServers().find(s => s.id === id);
-    const div = document.getElementById('server-details');
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-    if (server) {
-      div.innerHTML = `
-        <h1>${server.name}</h1>
-        <p><b>Тип:</b> ${server.type || '—'}</p>
-        <p><b>Статус:</b> ${server.status === 'online' ? '🟢 Онлайн' : '🔴 Оффлайн'}</p>
-        <p>${server.description || 'Без описания'}</p>
-        <p><b>IP:</b> ${server.ip}</p>
-        <button onclick="copyIP('${server.ip}')">🔗 Скопировать IP</button>
-      `;
+    const params = new URLSearchParams(window.location.search);
+    const serverId = params.get("id");
+
+    const serverBox = document.getElementById("serverBox");
+
+    if (!serverId) {
+      serverBox.innerText = "❌ Ошибка: ID сервера не найден.";
     } else {
-      div.innerHTML = `<p style="color:red;">❌ Сервер с ID <b>${id}</b> не найден. Возможно, вы удалили его или открыли ссылку с другого устройства.</p>`;
+      const serverRef = db.ref("servers/" + serverId);
+      serverRef.once("value").then(snapshot => {
+        const data = snapshot.val();
+        if (!data) {
+          serverBox.innerText = "❌ Сервер не найден.";
+        } else {
+          serverBox.innerHTML = `
+            <h2>${data.name}</h2>
+            <p><b>Тип:</b> ${data.type}</p>
+            <p><b>Статус:</b> ${data.status === "online" ? "🟢 Онлайн" : "🔴 Оффлайн"}</p>
+            <p><b>Описание:</b> ${data.description || "Без описания"}</p>
+            <button onclick="connect()">🔗 Подключиться</button>
+          `;
+        }
+      });
     }
 
-    function copyIP(ip) {
-      navigator.clipboard.writeText(ip);
-      alert("IP скопирован: " + ip);
+    function connect() {
+      alert("🔗 Подключение к серверу...");
     }
   </script>
 </body>
