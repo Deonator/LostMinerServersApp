@@ -38,6 +38,7 @@
 
   <input id="name" placeholder="Название сервера">
   <input id="type" placeholder="Тип (PvP, RP...)">
+  <input id="host" placeholder="Хост (IP или адрес)">
   <input id="desc" placeholder="Описание">
   <select id="status">
     <option value="online">🟢 Включен</option>
@@ -65,17 +66,19 @@
     document.getElementById("createBtn").addEventListener("click", () => {
       const name = document.getElementById("name").value.trim();
       const type = document.getElementById("type").value.trim();
+      const host = document.getElementById("host").value.trim();
       const desc = document.getElementById("desc").value.trim();
       const status = document.getElementById("status").value;
 
-      if (!name || !type) {
-        alert("Введите название и тип!");
+      if (!name || !type || !host) {
+        alert("Введите название, тип и хост!");
         return;
       }
 
       push(ref(db, "servers"), {
         name,
         type,
+        host,
         status,
         description: desc
       }).then(() => {
@@ -88,3 +91,4 @@
   </script>
 </body>
 </html>
+
