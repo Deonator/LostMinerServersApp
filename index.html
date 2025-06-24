@@ -2,23 +2,19 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Серверы LostMiner</title>
+  <title>Список серверов LostMiner</title>
   <style>
     body {
       background-color: #111;
       color: #fff;
       font-family: sans-serif;
-    }
-    a {
-      color: #00ffff;
-      text-decoration: none;
+      padding: 20px;
     }
     .server {
-      border: 1px solid #555;
-      padding: 10px;
+      background-color: #222;
+      padding: 12px;
       margin-bottom: 10px;
       border-radius: 8px;
-      background-color: #222;
     }
     .create-btn {
       display: inline-block;
@@ -35,16 +31,14 @@
   </style>
 </head>
 <body>
-  <h1>🌍 Список серверов LostMiner</h1>
+  <h1>🌍 Серверы LostMiner</h1>
   <div id="servers">Загрузка...</div>
-
   <a href="create.html" class="create-btn">➕ Создать сервер</a>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js"></script>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
-  <script>
     const firebaseConfig = {
       apiKey: "AIzaSyAIRk2K83lNl0Pun1Kk7swyRGaEOWH6zj0",
       authDomain: "loststrahzcorporation.firebaseapp.com",
@@ -52,36 +46,36 @@
       projectId: "loststrahzcorporation",
       storageBucket: "loststrahzcorporation.firebasestorage.app",
       messagingSenderId: "802412818791",
-      appId: "1:802412818791:web:e818386c7a6e6de2f7ffc2",
-      measurementId: "G-XYRS88N7KN"
+      appId: "1:802412818791:web:e818386c7a6e6de2f7ffc2"
     };
 
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-    const serversRef = db.ref("servers");
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const serversRef = ref(db, "servers");
+    const listDiv = document.getElementById("servers");
 
-    serversRef.on("value", (snapshot) => {
-      const list = document.getElementById("servers");
-      list.innerHTML = "";
-      if (!snapshot.exists()) {
-        list.innerHTML = "Нет серверов.";
+    onValue(serversRef, (snapshot) => {
+      const data = snapshot.val();
+      listDiv.innerHTML = "";
+
+      if (!data) {
+        listDiv.innerHTML = "Серверов пока нет.";
         return;
       }
-      snapshot.forEach(child => {
-        const data = child.val();
-        const id = child.key;
 
+      Object.entries(data).forEach(([id, server]) => {
         const div = document.createElement("div");
         div.className = "server";
         div.innerHTML = `
-          <a href="server.html?id=${id}">
-            <b>${data.name}</b>
-          </a><br>
-          Тип: ${data.type}<br>
-          Статус: ${data.status === "online" ? "🟢 Онлайн" : "🔴 Оффлайн"}
+          <strong>${server.name}</strong><br>
+          Тип: ${server.type}<br>
+          Статус: ${server.status === "online" ? "🟢 Онлайн" : "🔴 Оффлайн"}<br>
+          <small>${server.description || "Без описания"}</small>
         `;
-        list.appendChild(div);
+        listDiv.appendChild(div);
       });
+    }, (error) => {
+      listDiv.innerHTML = "Ошибка загрузки: " + error.message;
     });
   </script>
 </body>
