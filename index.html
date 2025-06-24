@@ -69,6 +69,7 @@
         div.innerHTML = `
           <strong>${server.name}</strong><br>
           Тип: ${server.type}<br>
+          Хост: ${server.host || "не указан"}<br>
           Статус: ${server.status === "online" ? "🟢 Онлайн" : "🔴 Оффлайн"}<br>
           <small>${server.description || "Без описания"}</small>
         `;
