@@ -27,6 +27,9 @@
       background-color: #444;
       cursor: not-allowed;
     }
+    button:hover:enabled {
+      background-color: #00cc00;
+    }
     a {
       color: #00ffff;
       text-decoration: none;
@@ -37,27 +40,19 @@
   <a href="index.html">← Назад</a>
   <h1>Создать сервер</h1>
 
-  <div id="auth">
-    <button id="loginBtn">🔐 Войти через Google</button>
-  </div>
-
-  <div id="form" style="display: none;">
-    <p id="userInfo"></p>
-    <input id="name" placeholder="Название сервера">
-    <input id="type" placeholder="Тип (PvP, RP...)">
-    <input id="host" placeholder="Хост (IP или адрес)">
-    <input id="desc" placeholder="Описание">
-    <select id="status">
-      <option value="online">🟢 Включен</option>
-      <option value="offline">🔴 Выключен</option>
-    </select>
-    <button id="createBtn">Создать</button>
-  </div>
+  <input id="name" placeholder="Название сервера">
+  <input id="type" placeholder="Тип (PvP, RP...)">
+  <input id="host" placeholder="Хост (IP или адрес)">
+  <input id="desc" placeholder="Описание">
+  <select id="status">
+    <option value="online">🟢 Включен</option>
+    <option value="offline">🔴 Выключен</option>
+  </select>
+  <button id="createBtn">Создать</button>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getDatabase, ref, push, get, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAIRk2K83lNl0Pun1Kk7swyRGaEOWH6zj0",
@@ -70,61 +65,50 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
     const db = getDatabase(app);
-    const provider = new GoogleAuthProvider();
 
-    const loginBtn = document.getElementById("loginBtn");
-    const formDiv = document.getElementById("form");
-    const authDiv = document.getElementById("auth");
-    const userInfo = document.getElementById("userInfo");
+    const createBtn = document.getElementById("createBtn");
 
-    loginBtn.onclick = () => signInWithPopup(auth, provider).catch(alert);
+    // Проверяем, был ли сервер создан этим пользователем
+    const alreadyCreated = localStorage.getItem("server_created");
 
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        authDiv.style.display = "none";
-        userInfo.textContent = `Вы вошли как ${user.displayName} (${user.email})`;
-        formDiv.style.display = "block";
+    if (alreadyCreated === "true") {
+      createBtn.disabled = true;
+      createBtn.textContent = "Сервер уже создан";
+    }
 
-        // Проверка: есть ли уже сервер от этого uid
-        const serversRef = ref(db, "servers");
-        const q = query(serversRef, orderByChild("uid"), equalTo(user.uid));
-        const snapshot = await get(q);
-
-        if (snapshot.exists()) {
-          document.getElementById("createBtn").disabled = true;
-          document.getElementById("createBtn").textContent = "У вас уже есть сервер";
-        }
-
-        document.getElementById("createBtn").onclick = async () => {
-          const name = document.getElementById("name").value.trim();
-          const type = document.getElementById("type").value.trim();
-          const host = document.getElementById("host").value.trim();
-          const desc = document.getElementById("desc").value.trim();
-          const status = document.getElementById("status").value;
-
-          if (!name || !type || !host) {
-            alert("Введите название, тип и хост!");
-            return;
-          }
-
-          await push(ref(db, "servers"), {
-            name,
-            type,
-            host,
-            status,
-            description: desc,
-            uid: user.uid,
-            email: user.email,
-            displayName: user.displayName
-          });
-
-          alert("✅ Сервер создан!");
-          window.location.href = "index.html";
-        };
+    createBtn.addEventListener("click", () => {
+      if (localStorage.getItem("server_created") === "true") {
+        alert("❗ Вы уже создали сервер.");
+        return;
       }
+
+      const name = document.getElementById("name").value.trim();
+      const type = document.getElementById("type").value.trim();
+      const host = document.getElementById("host").value.trim();
+      const desc = document.getElementById("desc").value.trim();
+      const status = document.getElementById("status").value;
+
+      if (!name || !type || !host) {
+        alert("Введите название, тип и хост!");
+        return;
+      }
+
+      push(ref(db, "servers"), {
+        name,
+        type,
+        host,
+        status,
+        description: desc
+      }).then(() => {
+        localStorage.setItem("server_created", "true");
+        alert("✅ Сервер создан!");
+        window.location.href = "index.html";
+      }).catch((error) => {
+        alert("❌ Ошибка: " + error.message);
+      });
     });
   </script>
 </body>
 </html>
+
