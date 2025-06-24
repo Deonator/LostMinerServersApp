@@ -4,13 +4,18 @@
   <meta charset="UTF-8">
   <title>Создание сервера</title>
   <style>
-    body { background-color: #111; color: white; font-family: sans-serif; padding: 20px; }
+    body {
+      background-color: #111;
+      color: #fff;
+      font-family: sans-serif;
+      padding: 20px;
+    }
     input, select, button {
       display: block;
       margin: 10px 0;
       padding: 10px;
       width: 300px;
-      border-radius: 4px;
+      border-radius: 5px;
       border: none;
     }
     button {
@@ -21,9 +26,14 @@
     button:hover {
       background-color: #00cc00;
     }
+    a {
+      color: #00ffff;
+      text-decoration: none;
+    }
   </style>
 </head>
 <body>
+  <a href="index.html">← Назад</a>
   <h1>Создать сервер</h1>
 
   <input id="name" placeholder="Название сервера">
@@ -33,9 +43,8 @@
     <option value="online">🟢 Включен</option>
     <option value="offline">🔴 Выключен</option>
   </select>
-  <button onclick="addServer()">Создать</button>
+  <button id="createBtn">Создать</button>
 
-  <!-- ✅ Firebase подключается как модуль -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -53,8 +62,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // Функция создания сервера
-    window.addServer = function () {
+    document.getElementById("createBtn").addEventListener("click", () => {
       const name = document.getElementById("name").value.trim();
       const type = document.getElementById("type").value.trim();
       const desc = document.getElementById("desc").value.trim();
@@ -76,7 +84,7 @@
       }).catch((error) => {
         alert("❌ Ошибка: " + error.message);
       });
-    };
+    });
   </script>
 </body>
 </html>
